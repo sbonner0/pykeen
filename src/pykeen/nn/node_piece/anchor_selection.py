@@ -32,6 +32,7 @@ __all__ = [
     "MixtureAnchorSelection",
     "PageRankAnchorSelection",
     "RandomAnchorSelection",
+    "FixedAnchorSelection",
 ]
 
 logger = logging.getLogger(__name__)
@@ -216,6 +217,31 @@ class RandomAnchorSelection(SingleSelection):
     # docstr-coverage: inherited
     def rank(self, edge_index: numpy.ndarray) -> numpy.ndarray:  # noqa: D102
         return self.generator.permutation(edge_index.max())
+
+
+class FixedAnchorSelection(SingleSelection):
+    """Fixed node selection."""
+
+    def __init__(
+        self,
+        num_anchors: int,
+        anchor_set: numpy.ndarray,
+    ) -> None:
+        """
+        Initialize the selection strategy.
+
+        :param num_anchors:
+            the number of anchors to select
+        :param anchor_set:
+            the list of anchors from which to choose
+        """
+        super().__init__(num_anchors=num_anchors)
+        assert num_anchors == anchor_set.shape[0], "Num anchors and the list of the anchor set is not equal"
+        self.anchor_set = anchor_set
+
+    # docstr-coverage: inherited
+    def rank(self, edge_index: numpy.ndarray = None) -> numpy.ndarray:  # noqa: D102
+        return self.anchor_set
 
 
 class MixtureAnchorSelection(AnchorSelection):
